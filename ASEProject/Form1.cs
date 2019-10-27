@@ -26,17 +26,23 @@ namespace ASEProject
         {
             if(e.KeyCode == Keys.Enter)
             {
-                if (textBoxCommand.Text.ToString().Equals("run()"))
+                if (textBoxCommand.Text.ToString().Equals("run"))
                 {
+
+                    drawCircle();
+
                     string[] commands = richTextBoxCommands.Text.ToString().Split('\n');
 
                     foreach (string command in commands)
                     {
                         Debug.WriteLine(command);
                     }
-                } else if(textBoxCommand.Text.ToString().Equals("clear()"))
+                } else if(textBoxCommand.Text.ToString().Equals("clearText"))
                 {
                     richTextBoxCommands.Clear();
+                } else if(textBoxCommand.Text.ToString().Equals("clear"))
+                {
+                    clearCommand();
                 }
 
                 textBoxCommand.Clear();
@@ -45,10 +51,32 @@ namespace ASEProject
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Graphics g = Graphics.FromImage(bm);
-            g.Clear(Color.White);
-            g.DrawEllipse(new Pen(Color.Red), 100, 100, 30, 30);
-            g.Dispose();
+            //Make image background white on Load
+            //clearCommand();
+            
+            drawCircle();
+        }
+
+        public void clearCommand()
+        {
+            using (Graphics g = Graphics.FromImage(bm))
+            {
+                g.Clear(Color.White);
+                g.Dispose();
+            }
+
+            pbMainDraw.Invalidate();
+        }
+
+        public void drawCircle()
+        {
+            using(Graphics g = Graphics.FromImage(bm))
+            {
+                g.DrawEllipse(new Pen(Color.Red), 100, 100, 30, 30);
+                g.Dispose();
+            }
+
+            pbMainDraw.Invalidate();
         }
     }
 }
