@@ -55,6 +55,7 @@ namespace ASEProject
 
         public void executeCommand(string com)
         {
+            ParameterParser parser = new ParameterParser();
             if (com.Equals("clearText"))
             {
                 richTextBoxCommands.Clear();
@@ -65,16 +66,17 @@ namespace ASEProject
             }
             else if (com.Contains("circle(") && com.EndsWith(")"))
             {
-                if (validateInput("circle", com))
+                int[] radius = parser.parseParams("circle", com);
+                if (radius != null)
                 {
-                    drawCircle(parseParams("circle", com)[0]);
+                    drawCircle(radius[0]);
                 }
             }
             else if (com.Contains("moveTo(") && com.EndsWith(")"))
             {
-                if (validateInput("move", com))
+                int[] parameters = parser.parseParams("move", com);
+                if (parameters != null)
                 {
-                    int[] parameters = parseParams("move", com);
                     moveTo(parameters[0], parameters[1]);
                 }
             }
@@ -83,8 +85,19 @@ namespace ASEProject
                 Debug.WriteLine(currentX);
             } else if(com.Contains("drawTo(") && com.EndsWith(")"))
             {
-                int[] parameters = parseParams("draw", com);
-                drawTo(parameters[0], parameters[1]);
+                int[] parameters = parser.parseParams("draw", com);
+                if (parameters != null)
+                {
+                    drawTo(parameters[0], parameters[1]);
+                }
+            } else if(com.Contains("rectangle(") && com.EndsWith(")"))
+            {
+                int[] parameters = parser.parseParams("rectangle", com);
+                    if(parameters != null)
+                {
+                    rect(parameters[0], parameters[1]);
+                }
+                
             }
 
             textBoxCommand.Clear();
@@ -132,66 +145,23 @@ namespace ASEProject
 
             currentX = x;
             currentY = y;
-        }
-
-        public bool validateInput(string type, string input)
-        {
-            if(type.Equals("circle"))
-            {
-
-                int a;
-                return int.TryParse(input.Substring(7, input.Length-8), out a);
-            } else if(type.Equals("move"))
-            {
-                int a, b;
-                string[] slicedParams = input.Substring(7, input.Length - 8).Split(',');
-                if(slicedParams.Length != 2)
-                {
-                    return false;
-                } else
-                {
-                    return int.TryParse(slicedParams[0], out a) && int.TryParse(slicedParams[1], out b);
-                }
-            } else if(type.Equals("draw"))
-            {
-                int a, b;
-                string[] slicedParams = input.Substring(7, input.Length - 8).Split(',');
-                if(slicedParams.Length != 2)
-                {
-                    return false;
-                } else
-                {
-                    return int.TryParse(slicedParams[0], out a) && int.TryParse(slicedParams[1], out b);
-                }
-            }
-
-            return false;
-        }
-
-        public int[] parseParams(string type, string command)
-        {
-            if(type.Equals("circle"))
-            {
-                int[] parameters = new int[1];
-                parameters[0] = int.Parse(command.Substring(7, command.Length - 8));
-                return parameters;
-            } else if(type.Equals("move") || type.Equals("draw"))
-            {
-                int[] parameters = new int[2];
-                string[] slicedParams = command.Substring(7, command.Length - 8).Split(',');
-                parameters[0] = int.Parse(slicedParams[0]);
-                parameters[1] = int.Parse(slicedParams[1]);
-
-                return parameters;
-            }
-
-            return null;
-        }
+        } 
 
         public void moveTo(int x, int y)
         {
             currentX = x;
             currentY = y;
+        }
+
+        public void rect(int width, int height)
+        {
+            using (Graphics g = Graphics.FromImage(bm))
+            {
+                g.DrawRectangle(new Pen(Color.Red), currentX, currentY, width, height);
+                g.Dispose();
+            }
+
+            pbMainDraw.Invalidate();
         }
     }
 }
