@@ -81,6 +81,10 @@ namespace ASEProject
             else if (com.Equals("currentX"))
             {
                 Debug.WriteLine(currentX);
+            } else if(com.Contains("drawTo(") && com.EndsWith(")"))
+            {
+                int[] parameters = parseParams("draw", com);
+                drawTo(parameters[0], parameters[1]);
             }
 
             textBoxCommand.Clear();
@@ -114,6 +118,22 @@ namespace ASEProject
             pbMainDraw.Invalidate();
         }
 
+        public void drawTo(int x, int y)
+        {
+            using(Graphics g = Graphics.FromImage(bm))
+            {
+                Point currentPoint = new Point(currentX, currentY);
+                Point drawToPoint = new Point(x, y);
+                g.DrawLine(new Pen(Color.Red), currentPoint, drawToPoint);
+                g.Dispose();
+            }
+
+            pbMainDraw.Invalidate();
+
+            currentX = x;
+            currentY = y;
+        }
+
         public bool validateInput(string type, string input)
         {
             if(type.Equals("circle"))
@@ -122,6 +142,17 @@ namespace ASEProject
                 int a;
                 return int.TryParse(input.Substring(7, input.Length-8), out a);
             } else if(type.Equals("move"))
+            {
+                int a, b;
+                string[] slicedParams = input.Substring(7, input.Length - 8).Split(',');
+                if(slicedParams.Length != 2)
+                {
+                    return false;
+                } else
+                {
+                    return int.TryParse(slicedParams[0], out a) && int.TryParse(slicedParams[1], out b);
+                }
+            } else if(type.Equals("draw"))
             {
                 int a, b;
                 string[] slicedParams = input.Substring(7, input.Length - 8).Split(',');
@@ -144,13 +175,12 @@ namespace ASEProject
                 int[] parameters = new int[1];
                 parameters[0] = int.Parse(command.Substring(7, command.Length - 8));
                 return parameters;
-            } else if(type.Equals("move"))
+            } else if(type.Equals("move") || type.Equals("draw"))
             {
                 int[] parameters = new int[2];
                 string[] slicedParams = command.Substring(7, command.Length - 8).Split(',');
                 parameters[0] = int.Parse(slicedParams[0]);
                 parameters[1] = int.Parse(slicedParams[1]);
-                Debug.WriteLine(slicedParams[0]+ " " + slicedParams[1]);
 
                 return parameters;
             }
