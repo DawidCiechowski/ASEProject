@@ -63,6 +63,9 @@ namespace ASEProject
         {
             labelX.Text = "Current X: " + currentX;
             labelY.Text = "Current Y: " + currentY;
+
+            commandEditortooltip.SetToolTip(this.richTextBoxCommands, "Text Editor, write your program in here.");
+            commandTextBoxToolTip.SetToolTip(this.textBoxCommand, "Single command text box. Type 'run' to execute your entire program.");
         }
 
         public PictureBox getMainDraw()

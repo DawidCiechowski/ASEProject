@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.richTextBoxCommands = new System.Windows.Forms.RichTextBox();
             this.textBoxCommand = new System.Windows.Forms.TextBox();
             this.pbMainDraw = new System.Windows.Forms.PictureBox();
@@ -37,6 +38,8 @@
             this.btnExit = new System.Windows.Forms.Button();
             this.labelX = new System.Windows.Forms.Label();
             this.labelY = new System.Windows.Forms.Label();
+            this.commandEditortooltip = new System.Windows.Forms.ToolTip(this.components);
+            this.commandTextBoxToolTip = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pbMainDraw)).BeginInit();
             this.SuspendLayout();
             // 
@@ -141,6 +144,29 @@
             this.labelY.TabIndex = 8;
             this.labelY.Text = "label1";
             // 
+            // commandEditortooltip
+            // 
+            this.commandEditortooltip.AutomaticDelay = 1000;
+            this.commandEditortooltip.AutoPopDelay = 5000;
+            this.commandEditortooltip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(36)))), ((int)(((byte)(39)))));
+            this.commandEditortooltip.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(104)))), ((int)(((byte)(184)))), ((int)(((byte)(236)))));
+            this.commandEditortooltip.InitialDelay = 1000;
+            this.commandEditortooltip.IsBalloon = true;
+            this.commandEditortooltip.ReshowDelay = 200;
+            this.commandEditortooltip.StripAmpersands = true;
+            this.commandEditortooltip.ToolTipTitle = "Command Edtor";
+            // 
+            // commandTextBoxToolTip
+            // 
+            this.commandTextBoxToolTip.AutomaticDelay = 1000;
+            this.commandTextBoxToolTip.AutoPopDelay = 5000;
+            this.commandTextBoxToolTip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(36)))), ((int)(((byte)(39)))));
+            this.commandTextBoxToolTip.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(104)))), ((int)(((byte)(184)))), ((int)(((byte)(236)))));
+            this.commandTextBoxToolTip.InitialDelay = 1000;
+            this.commandTextBoxToolTip.IsBalloon = true;
+            this.commandTextBoxToolTip.ReshowDelay = 200;
+            this.commandTextBoxToolTip.ToolTipTitle = "Single Command Text Box";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -178,6 +204,8 @@
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Label labelX;
         private System.Windows.Forms.Label labelY;
+        private System.Windows.Forms.ToolTip commandEditortooltip;
+        private System.Windows.Forms.ToolTip commandTextBoxToolTip;
     }
 }
 
