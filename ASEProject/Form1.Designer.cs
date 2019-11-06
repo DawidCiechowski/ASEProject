@@ -35,6 +35,8 @@
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
+            this.labelX = new System.Windows.Forms.Label();
+            this.labelY = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbMainDraw)).BeginInit();
             this.SuspendLayout();
             // 
@@ -60,13 +62,14 @@
             this.textBoxCommand.Name = "textBoxCommand";
             this.textBoxCommand.Size = new System.Drawing.Size(607, 20);
             this.textBoxCommand.TabIndex = 1;
+            this.textBoxCommand.TextChanged += new System.EventHandler(this.textBoxCommand_TextChanged);
             this.textBoxCommand.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxCommand_KeyUp);
             // 
             // pbMainDraw
             // 
             this.pbMainDraw.Location = new System.Drawing.Point(645, 0);
             this.pbMainDraw.Name = "pbMainDraw";
-            this.pbMainDraw.Size = new System.Drawing.Size(641, 572);
+            this.pbMainDraw.Size = new System.Drawing.Size(641, 555);
             this.pbMainDraw.TabIndex = 2;
             this.pbMainDraw.TabStop = false;
             // 
@@ -75,7 +78,7 @@
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.Location = new System.Drawing.Point(638, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1, 555);
+            this.panel1.Size = new System.Drawing.Size(1, 574);
             this.panel1.TabIndex = 3;
             // 
             // btnLoad
@@ -115,12 +118,36 @@
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
+            // labelX
+            // 
+            this.labelX.AutoSize = true;
+            this.labelX.Font = new System.Drawing.Font("Arial", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelX.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(104)))), ((int)(((byte)(184)))), ((int)(((byte)(236)))));
+            this.labelX.Location = new System.Drawing.Point(642, 558);
+            this.labelX.Name = "labelX";
+            this.labelX.Size = new System.Drawing.Size(46, 16);
+            this.labelX.TabIndex = 7;
+            this.labelX.Text = "label1";
+            // 
+            // labelY
+            // 
+            this.labelY.AutoSize = true;
+            this.labelY.Font = new System.Drawing.Font("Arial", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelY.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(104)))), ((int)(((byte)(184)))), ((int)(((byte)(236)))));
+            this.labelY.Location = new System.Drawing.Point(783, 558);
+            this.labelY.Name = "labelY";
+            this.labelY.Size = new System.Drawing.Size(46, 16);
+            this.labelY.TabIndex = 8;
+            this.labelY.Text = "label1";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(36)))), ((int)(((byte)(39)))));
             this.ClientSize = new System.Drawing.Size(1287, 574);
+            this.Controls.Add(this.labelY);
+            this.Controls.Add(this.labelX);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnLoad);
@@ -148,6 +175,8 @@
         private System.Windows.Forms.Button btnLoad;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Label labelX;
+        private System.Windows.Forms.Label labelY;
     }
 }
 
