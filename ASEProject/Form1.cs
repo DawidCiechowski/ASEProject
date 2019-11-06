@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 
 namespace ASEProject
@@ -113,7 +114,7 @@ namespace ASEProject
         {
             using (Graphics g = Graphics.FromImage(bm))
             {
-                g.Clear(Color.White);
+                g.Clear(Color.FromArgb(0, 34, 36, 39));
                 g.Dispose();
             }
 
@@ -124,7 +125,7 @@ namespace ASEProject
         {
             using(Graphics g = Graphics.FromImage(bm))
             {
-                g.DrawEllipse(new Pen(Color.Red), currentX, currentY, radius, radius);
+                g.DrawEllipse(new Pen(Color.White), currentX, currentY, radius, radius);
                 g.Dispose();
             }
 
@@ -137,7 +138,7 @@ namespace ASEProject
             {
                 Point currentPoint = new Point(currentX, currentY);
                 Point drawToPoint = new Point(x, y);
-                g.DrawLine(new Pen(Color.Red), currentPoint, drawToPoint);
+                g.DrawLine(new Pen(Color.White), currentPoint, drawToPoint);
                 g.Dispose();
             }
 
@@ -157,11 +158,52 @@ namespace ASEProject
         {
             using (Graphics g = Graphics.FromImage(bm))
             {
-                g.DrawRectangle(new Pen(Color.Red), currentX, currentY, width, height);
+                g.DrawRectangle(new Pen(Color.White), currentX, currentY, width, height);
                 g.Dispose();
             }
 
             pbMainDraw.Invalidate();
+        }
+
+        public void triangle(int a, int b, int c)
+        {
+            Point one = new Point();
+            using (Graphics g = Graphics.FromImage(bm))
+            {
+                
+                g.Dispose();
+            }
+
+            pbMainDraw.Invalidate();
+        }
+
+        private void richTextBoxCommands_TextChanged(object sender, EventArgs e)
+        {
+            HighlightKeyWords(richTextBoxCommands.Text);
+        }
+
+        public void HighlightKeyWords(string text)
+        {
+            string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo|currentX|currentY)";
+            Regex regex = new Regex(expressions);
+            MatchCollection mc = regex.Matches(text);
+            int startCursorPosition = richTextBoxCommands.SelectionStart;
+
+            foreach(Match m in mc)
+            {
+                int startIndex = m.Index;
+                int stopIndex = m.Length;
+                richTextBoxCommands.Select(startIndex, stopIndex);
+                richTextBoxCommands.SelectionColor = Color.Green;
+                richTextBoxCommands.SelectionStart = startCursorPosition;
+
+                richTextBoxCommands.SelectionColor = Color.FromArgb(0, 104, 184, 236);
+            }
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
