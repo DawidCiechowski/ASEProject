@@ -58,11 +58,10 @@
             // 
             this.textBoxCommand.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBoxCommand.Font = new System.Drawing.Font("Arial", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxCommand.Location = new System.Drawing.Point(13, 485);
+            this.textBoxCommand.Location = new System.Drawing.Point(12, 485);
             this.textBoxCommand.Name = "textBoxCommand";
             this.textBoxCommand.Size = new System.Drawing.Size(607, 20);
             this.textBoxCommand.TabIndex = 1;
-            this.textBoxCommand.TextChanged += new System.EventHandler(this.textBoxCommand_TextChanged);
             this.textBoxCommand.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxCommand_KeyUp);
             // 
             // pbMainDraw
@@ -92,6 +91,7 @@
             this.btnLoad.TabIndex = 4;
             this.btnLoad.Text = "Load";
             this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
             // btnSave
             // 
@@ -104,6 +104,7 @@
             this.btnSave.TabIndex = 5;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnExit
             // 

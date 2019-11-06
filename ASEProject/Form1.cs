@@ -129,12 +129,12 @@ namespace ASEProject
 
         private void richTextBoxCommands_TextChanged(object sender, EventArgs e)
         {
-            HighlightKeyWords(richTextBoxCommands.Text, true);
+            HighlightKeyWordsRichTextBox(richTextBoxCommands.Text);
         }
 
-        public void HighlightKeyWords(string text, bool type)
+        public void HighlightKeyWordsRichTextBox(string text)
         {
-            string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo|)";
+            string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo)";
             Regex regex = new Regex(expressions);
             MatchCollection mc = regex.Matches(text);
             int startCursorPosition = richTextBoxCommands.SelectionStart;
@@ -147,19 +147,21 @@ namespace ASEProject
                 richTextBoxCommands.SelectionColor = Color.Green;
                 richTextBoxCommands.SelectionStart = startCursorPosition;
 
-                if (type)
-                {
-                    richTextBoxCommands.SelectionColor = Color.FromArgb(0, 104, 184, 236);
-                } else
-                {
-                    richTextBoxCommands.SelectionColor = Color.Black;
-                }
+
+                richTextBoxCommands.SelectionColor = Color.FromArgb(0, 104, 184, 236);
             }
         }
 
-        private void textBoxCommand_TextChanged(object sender, EventArgs e)
+        private void btnLoad_Click(object sender, EventArgs e)
         {
-            HighlightKeyWords(richTextBoxCommands.Text, false);
+            LoadFile load = new LoadFile(this);
+            load.load();
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            SaveFile save = new SaveFile(this);
+            save.save();
         }
 
         private void btnExit_Click(object sender, EventArgs e)
