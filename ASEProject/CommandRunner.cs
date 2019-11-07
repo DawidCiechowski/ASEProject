@@ -61,6 +61,14 @@ namespace ASEProject
                     rect.doAction();
                 }
 
+            } else if(com.Contains("triangle(") && com.EndsWith(")"))
+            {
+                int[] parameters = parser.parseParams("triangle", com);
+                if (parameters != null)
+                {
+                    TriangleCommand triangle = new TriangleCommand(f, parameters[0], parameters[1], parameters[2]);
+                    triangle.doAction();
+                }
             }
 
             f.getCommandsTextBox().Clear();
