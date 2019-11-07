@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ASEProject
 {
-    class ParameterParser
+    public class ParameterParser
     {
 
         public int[] parseParams(string type, string command)
@@ -21,7 +21,7 @@ namespace ASEProject
                 } else 
                 {
                     invalidArgumentPopUpCircle();
-                    return null; 
+                    throw new Exception("Invalid parameters.");
                 }
             }
             else if (type.Equals("move") || type.Equals("draw"))
@@ -37,6 +37,7 @@ namespace ASEProject
                 } else
                 {
                     invalidArgumentsPopUp(type, 2);
+                    throw new Exception("Invalid parameters.");
                 }
             } else if(type.Equals("rectangle"))
             {
@@ -52,6 +53,7 @@ namespace ASEProject
                 else
                 {
                     invalidArgumentsPopUp(type, 2);
+                    throw new Exception("Invalid parameters.");
                 }
             } else if(type.Equals("triangle"))
             {
@@ -67,10 +69,17 @@ namespace ASEProject
                 } else
                 {
                     invalidArgumentsPopUp(type, 3);
+                    throw new Exception("Invalid parameters.");
                 }
+            } else
+            {
+                System.Windows.Forms.MessageBoxButtons button = System.Windows.Forms.MessageBoxButtons.OK;
+                string caption = "UNKNOWN COMMAND";
+                string message = $"Command '{command} doesn't exist!";
+                System.Windows.Forms.MessageBoxIcon icon = System.Windows.Forms.MessageBoxIcon.Error;
+                System.Windows.Forms.MessageBox.Show(message, caption, button, icon);
+                throw new Exception("Unknown command");
             }
-
-            return null;
         }
 
         public bool validateInput(string type, string input)
