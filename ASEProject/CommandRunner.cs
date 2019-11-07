@@ -69,6 +69,9 @@ namespace ASEProject
                     TriangleCommand triangle = new TriangleCommand(f, parameters[0], parameters[1], parameters[2]);
                     triangle.doAction();
                 }
+            } else
+            {
+                parser.parseParams("Unkown", com);
             }
 
             f.getCommandsTextBox().Clear();

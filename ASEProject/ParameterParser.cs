@@ -21,7 +21,6 @@ namespace ASEProject
                 } else 
                 {
                     invalidArgumentPopUpCircle();
-                    throw new Exception("Invalid parameters.");
                 }
             }
             else if (type.Equals("move") || type.Equals("draw"))
@@ -37,7 +36,6 @@ namespace ASEProject
                 } else
                 {
                     invalidArgumentsPopUp(type, 2);
-                    throw new Exception("Invalid parameters.");
                 }
             } else if(type.Equals("rectangle"))
             {
@@ -53,7 +51,6 @@ namespace ASEProject
                 else
                 {
                     invalidArgumentsPopUp(type, 2);
-                    throw new Exception("Invalid parameters.");
                 }
             } else if(type.Equals("triangle"))
             {
@@ -69,7 +66,6 @@ namespace ASEProject
                 } else
                 {
                     invalidArgumentsPopUp(type, 3);
-                    throw new Exception("Invalid parameters.");
                 }
             } else
             {
@@ -78,8 +74,9 @@ namespace ASEProject
                 string message = $"Command '{command} doesn't exist!";
                 System.Windows.Forms.MessageBoxIcon icon = System.Windows.Forms.MessageBoxIcon.Error;
                 System.Windows.Forms.MessageBox.Show(message, caption, button, icon);
-                throw new Exception("Unknown command");
             }
+
+            return null;
         }
 
         public bool validateInput(string type, string input)

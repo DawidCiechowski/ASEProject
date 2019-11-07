@@ -16,15 +16,7 @@ namespace ASEProject.Tests
         {
             ParameterParser parser = new ParameterParser();
 
-            try
-            {
-                parser.parseParams("move", "moveTo(100, 100, 200)");
-            } catch(Exception e)
-            {
-                StringAssert.Contains(e.Message, "Invalid parameters");
-                return;
-            }
-            Assert.Fail("No exception was thrown!");
+            Assert.IsFalse(parser.validateInput("move", "moveTo(100, 100, 200"));
         }
 
         [TestMethod()]
@@ -32,16 +24,7 @@ namespace ASEProject.Tests
         {
             ParameterParser parser = new ParameterParser();
 
-            try
-            {
-                parser.parseParams("triangle", "triangle(100, 100)");
-            }
-            catch (Exception e)
-            {
-                StringAssert.Contains(e.Message, "Invalid parameters");
-                return;
-            }
-            Assert.Fail("No exception was thrown!");
+            Assert.IsFalse(parser.validateInput("triangle", "triangle(20, 20)"));
         }
 
         [TestMethod()]
@@ -49,16 +32,8 @@ namespace ASEProject.Tests
         {
             ParameterParser parser = new ParameterParser();
 
-            try
-            {
-                parser.parseParams("circle", "circle(100, 100, 200)");
-            }
-            catch (Exception e)
-            {
-                StringAssert.Contains(e.Message, "Invalid parameters");
-                return;
-            }
-            Assert.Fail("No exception was thrown!");
+
+            Assert.IsFalse(parser.validateInput("circle", "circle(20, 20)"));
         }
 
         [TestMethod()]
@@ -66,16 +41,7 @@ namespace ASEProject.Tests
         {
             ParameterParser parser = new ParameterParser();
 
-            try
-            {
-                parser.parseParams("rectangle", "rectangle(100, 100, 200)");
-            }
-            catch (Exception e)
-            {
-                StringAssert.Contains(e.Message, "Invalid parameters");
-                return;
-            }
-            Assert.Fail("No exception was thrown!");
+            Assert.IsFalse(parser.validateInput("rectangle", "rectangle(0)"));
         }
 
         [TestMethod()]
@@ -83,16 +49,7 @@ namespace ASEProject.Tests
         {
             ParameterParser parser = new ParameterParser();
 
-            try
-            {
-                parser.parseParams("", "Test");
-            }
-            catch (Exception e)
-            {
-                StringAssert.Contains(e.Message, "Unknown command");
-                return;
-            }
-            Assert.Fail("No exception was thrown!");
+            Assert.IsNull(parser.parseParams("Unknown", "Test case"));
         }
     }
 }
