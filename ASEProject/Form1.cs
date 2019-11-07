@@ -18,6 +18,7 @@ namespace ASEProject
 
         Bitmap bm;
         private int currentX, currentY;
+        private string currentFile;
      
         public Form1()
         {
@@ -30,10 +31,12 @@ namespace ASEProject
 
             currentX = 0;
             currentY = 0;
+            currentFile = "";
         }
 
         private void textBoxCommand_KeyUp(object sender, KeyEventArgs e)
         {
+            //Execute all commands using 'run' or one command at a time.
             CommandRunner cr = new CommandRunner(this);
 
             if (e.KeyCode == Keys.Enter)
@@ -58,7 +61,7 @@ namespace ASEProject
         }
 
         
-
+        //On load actions
         private void Form1_Load(object sender, EventArgs e)
         {
             labelX.Text = "Current X: " + currentX;
@@ -68,6 +71,7 @@ namespace ASEProject
             commandTextBoxToolTip.SetToolTip(this.textBoxCommand, "Single command text box. Type 'run' to execute your entire program.");
         }
 
+        //Getters/Setters
         public PictureBox getMainDraw()
         {
             return pbMainDraw;
@@ -118,23 +122,23 @@ namespace ASEProject
             return labelY;
         }
 
-        public void triangle(int a, int b, int c)
+        public string getCurrentFile()
         {
-            Point one = new Point();
-            using (Graphics g = Graphics.FromImage(bm))
-            {
-                
-                g.Dispose();
-            }
-
-            pbMainDraw.Invalidate();
+            return currentFile;
         }
+
+        public void setCurrentFile(string fileName)
+        {
+            currentFile = fileName;
+        }
+
 
         private void richTextBoxCommands_TextChanged(object sender, EventArgs e)
         {
             HighlightKeyWordsRichTextBox(richTextBoxCommands.Text);
         }
 
+        //Lint - Command Highlighter
         public void HighlightKeyWordsRichTextBox(string text)
         {
             string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo)";
@@ -155,6 +159,8 @@ namespace ASEProject
             }
         }
 
+
+        //Button functions LOAD/SAVE/EXIT
         private void btnLoad_Click(object sender, EventArgs e)
         {
             LoadFile load = new LoadFile(this);

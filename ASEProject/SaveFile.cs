@@ -22,15 +22,23 @@ namespace ASEProject
 
         public void save()
         {
+            //Write the contents of rich text box into memory stream
             f.getCommandsRichTextBox().SaveFile(ms, RichTextBoxStreamType.PlainText);
             ms.WriteByte(13);
             
 
+            //Create dialog to save file and set the rules of the dialog
             sfd = new SaveFileDialog();
             sfd.CreatePrompt = true;
             sfd.OverwritePrompt = true;
 
-            sfd.FileName = "My Program";
+            if(!f.getCurrentFile().Equals(""))
+            {
+                sfd.FileName = f.getCurrentFile();
+            } else
+            {
+                sfd.FileName = "My Program";
+            }
             sfd.DefaultExt = "txt";
             sfd.Filter = "Text (*.txt)|*.txt|All files (*.*)|*.*";
             sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);

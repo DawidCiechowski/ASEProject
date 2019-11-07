@@ -8,11 +8,18 @@ namespace ASEProject
 {
     class CommandRunner
     {
+        //Vars and constructor
         Form1 f;
         public CommandRunner(Form1 f)
         {
             this.f = f;
         }
+
+        /**
+         * Create new instance of ParameterParser
+         * Get the command, and validate its' type
+         * With returned parameters, run any given command.
+         */
         public void executeCommand(string com)
         {
             ParameterParser parser = new ParameterParser();

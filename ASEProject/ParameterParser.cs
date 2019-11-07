@@ -9,6 +9,10 @@ namespace ASEProject
     public class ParameterParser
     {
 
+        /**
+         * Get the type of command being written by the user and the command itself
+         * Validate the input for the current command. If it's valid return the parameters obtained, otherwise show pop-up.
+         */
         public int[] parseParams(string type, string command)
         {
             if (type.Equals("circle"))
@@ -79,6 +83,15 @@ namespace ASEProject
             return null;
         }
 
+
+        /**
+         * @params type - what type of command is the program supposed to check
+         * @params input - the actual command written by the user
+         * Check the type of command
+         * split the command written by the user, to check what's inbetween the brackets - seperated by a comma.
+         * if the number of arguments is correct, check if they are parsable, to ensure the type is ok.
+         * if everything is fine return true, else false
+         */
         public bool validateInput(string type, string input)
         {
             if (type.Equals("circle"))
@@ -127,6 +140,7 @@ namespace ASEProject
             return false;
         }
 
+        //Invalid arguments pop-up messages.
         public void invalidArgumentsPopUp(string type, int numberOfArgs)
         {
             System.Windows.Forms.MessageBoxButtons button = System.Windows.Forms.MessageBoxButtons.OK;
