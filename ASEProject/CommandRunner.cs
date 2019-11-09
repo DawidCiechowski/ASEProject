@@ -20,6 +20,8 @@ namespace ASEProject
          * Get the command, and validate its' type
          * With returned parameters, run any given command.
          */
+        
+       
         public void executeCommand(string com)
         {
             ParameterParser parser = new ParameterParser();
@@ -34,7 +36,7 @@ namespace ASEProject
             }
             else if (com.Contains("circle(") && com.EndsWith(")"))
             {
-                int[] radius = parser.parseParams("circle", com);
+                int[] radius = parser.parseParams(com);
                 if (radius != null)
                 {
                     Circle circle = new Circle(f, radius[0]);
@@ -43,7 +45,7 @@ namespace ASEProject
             }
             else if (com.Contains("moveTo(") && com.EndsWith(")"))
             {
-                int[] parameters = parser.parseParams("move", com);
+                int[] parameters = parser.parseParams(com);
                 if (parameters != null)
                 {
                     MoveToCommand move = new MoveToCommand(f, parameters[0], parameters[1]);
@@ -52,7 +54,7 @@ namespace ASEProject
             }
             else if (com.Contains("drawTo(") && com.EndsWith(")"))
             {
-                int[] parameters = parser.parseParams("draw", com);
+                int[] parameters = parser.parseParams(com);
                 if (parameters != null)
                 {
                     DrawToCommand draw = new DrawToCommand(f, parameters[0], parameters[1]);
@@ -61,7 +63,7 @@ namespace ASEProject
             }
             else if (com.Contains("rectangle(") && com.EndsWith(")"))
             {
-                int[] parameters = parser.parseParams("rectangle", com);
+                int[] parameters = parser.parseParams(com);
                 if (parameters != null)
                 {
                     RectangleCommand rect = new RectangleCommand(f, parameters[0], parameters[1]);
@@ -70,7 +72,7 @@ namespace ASEProject
 
             } else if(com.Contains("triangle(") && com.EndsWith(")"))
             {
-                int[] parameters = parser.parseParams("triangle", com);
+                int[] parameters = parser.parseParams(com);
                 if (parameters != null)
                 {
                     TriangleCommand triangle = new TriangleCommand(f, parameters[0], parameters[1], parameters[2]);
@@ -78,7 +80,7 @@ namespace ASEProject
                 }
             } else
             {
-                parser.parseParams("Unkown", com);
+                parser.parseParams(com);
             }
 
             f.getCommandsTextBox().Clear();

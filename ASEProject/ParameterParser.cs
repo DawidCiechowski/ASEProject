@@ -3,86 +3,73 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace ASEProject
 {
     public class ParameterParser
     {
 
-        /**
-         * Get the type of command being written by the user and the command itself
-         * Validate the input for the current command. If it's valid return the parameters obtained, otherwise show pop-up.
-         */
-        public int[] parseParams(string type, string command)
+
+
+        public int[] parseParams(string command)
         {
-            if (type.Equals("circle"))
-            {
-                if (validateInput(type, command))
-                {
-                    int[] parameters = new int[1];
-                    parameters[0] = int.Parse(command.Substring(7, command.Length - 8));
-                    return parameters;
-                } else 
-                {
-                    invalidArgumentPopUpCircle();
-                }
-            }
-            else if (type.Equals("move") || type.Equals("draw"))
-            {
-                if (validateInput(type, command))
-                {
-                    int[] parameters = new int[2];
-                    string[] slicedParams = command.Substring(7, command.Length - 8).Split(',');
-                    parameters[0] = int.Parse(slicedParams[0]);
-                    parameters[1] = int.Parse(slicedParams[1]);
 
-                    return parameters;
-                } else
-                {
-                    invalidArgumentsPopUp(type, 2);
-                }
-            } else if(type.Equals("rectangle"))
+            MatchCollection matches = checkFunction(command);
+            if (matches.Count > 0)
             {
-                if (validateInput(type, command))
-                {
-                    int[] parameters = new int[2];
-                    string[] slicedParams = command.Substring(10, command.Length - 11).Split(',');
-                    parameters[0] = int.Parse(slicedParams[0]);
-                    parameters[1] = int.Parse(slicedParams[1]);
+                string funcVars = Regex.Match(matches[0].ToString(), @"\([^)]*\)").ToString();
+                string funcType = matches[0].ToString().Split(funcVars.ToCharArray())[0];
+                string[] vars = funcVars.Substring(1, funcVars.Length - 2).Split(',');
 
-                    return parameters;
+
+                if (validateInput(funcType, vars))
+                {
+                    return returnValues(vars);
                 }
                 else
                 {
-                    invalidArgumentsPopUp(type, 2);
+                    callAppropriateErrorMessage(funcType);
                 }
-            } else if(type.Equals("triangle"))
-            {
-                if(validateInput(type, command))
-                {
-                    int[] parameters = new int[3];
-                    string[] slicedParams = command.Substring(9, command.Length - 10).Split(',');
-                    parameters[0] = int.Parse(slicedParams[0]);
-                    parameters[1] = int.Parse(slicedParams[1]);
-                    parameters[2] = int.Parse(slicedParams[2]);
-
-                    return parameters;
-                } else
-                {
-                    invalidArgumentsPopUp(type, 3);
-                }
-            } else
-            {
-                System.Windows.Forms.MessageBoxButtons button = System.Windows.Forms.MessageBoxButtons.OK;
-                string caption = "UNKNOWN COMMAND";
-                string message = $"Command '{command} doesn't exist!";
-                System.Windows.Forms.MessageBoxIcon icon = System.Windows.Forms.MessageBoxIcon.Error;
-                System.Windows.Forms.MessageBox.Show(message, caption, button, icon);
             }
 
             return null;
         }
 
+        public MatchCollection checkFunction(string command)
+        {
+            string regularExpression = @"circle\([^)]*\)|triangle\([^)]*\)|rectangle\([^)]*\)|moveTo\([^)]*\)|drawTo\([^)]*\)";
+            Regex r = new Regex(regularExpression);
+            return r.Matches(command);
+        }
+
+        public int[] returnValues(string[] vars)
+        {
+            int[] returnVars = new int[vars.Length];
+            for (int i = 0; i < vars.Length; ++i)
+            {
+                returnVars[i] = int.Parse(vars[i].ToString());
+            }
+
+            return returnVars;
+        }
+
+        public void callAppropriateErrorMessage(string funcType)
+        {
+            if (funcType.Equals("circle"))
+            {
+                invalidArgumentsPopUp(funcType, 1);
+            }
+            else if (funcType.Equals("rectangle") || funcType.Equals("moveTo") || funcType.Equals("drawTo"))
+            {
+                invalidArgumentsPopUp(funcType, 2);
+            }
+            else if (funcType.Equals("triangle"))
+            {
+                invalidArgumentsPopUp(funcType, 3);
+            }
+        }
 
         /**
          * @params type - what type of command is the program supposed to check
@@ -92,70 +79,82 @@ namespace ASEProject
          * if the number of arguments is correct, check if they are parsable, to ensure the type is ok.
          * if everything is fine return true, else false
          */
-        public bool validateInput(string type, string input)
+        public bool validateInput(string type, string[] vars)
         {
-            if (type.Equals("circle"))
+       
+            if(type.Equals("circle"))
             {
-
-                int a;
-                return int.TryParse(input.Substring(7, input.Length - 8), out a);
-            }
-            else if (type.Equals("move") || type.Equals("draw"))
+                return checkOneParam(vars);
+            } else if(type.Equals("rectangle") || type.Equals("moveTo") || type.Equals("drawTo"))
             {
-                int a, b;
-                string[] slicedParams = input.Substring(7, input.Length - 8).Split(',');
-                if (slicedParams.Length != 2)
-                {
-                    return false;
-                }
-                else
-                {
-                    return int.TryParse(slicedParams[0], out a) && int.TryParse(slicedParams[1], out b);
-                }
-            } else if(type.Equals("rectangle"))
-            {
-                int a, b;
-                string[] slicedParams = input.Substring(10, input.Length - 11).Split(',');
-                if (slicedParams.Length != 2)
-                {
-                    return false;
-                }
-                else
-                {
-                    return int.TryParse(slicedParams[0], out a) && int.TryParse(slicedParams[1], out b);
-                }
+                return checkTwoParams(vars);
             } else if(type.Equals("triangle"))
             {
-                int a, b, c;
-                string[] slicedParams = input.Substring(9, input.Length - 10).Split(',');
-                if(slicedParams.Length != 3)
-                {
-                    return false;
-                } else
-                {
-                    return int.TryParse(slicedParams[0], out a) && int.TryParse(slicedParams[1], out b) && int.TryParse(slicedParams[1], out c);
-                }
+                return checkThreeParams(vars);
             }
            
             return false;
         }
 
-        //Invalid arguments pop-up messages.
-        public void invalidArgumentsPopUp(string type, int numberOfArgs)
+
+        //Check parameters functions
+        public bool checkOneParam(string[] param)
         {
-            System.Windows.Forms.MessageBoxButtons button = System.Windows.Forms.MessageBoxButtons.OK;
-            string caption = "INVALID PARAMETERs";
-            string message = ($"{type} function takes {numberOfArgs} INTEGER arugments!");
-            message = message.Substring(0, 1).ToUpper() + message.Substring(1, message.Length - 1);
-            System.Windows.Forms.MessageBoxIcon icon = System.Windows.Forms.MessageBoxIcon.Error;
-            System.Windows.Forms.MessageBox.Show(message, caption, button, icon);
+            Debug.WriteLine(param.Length);
+
+            if (param.Length != 1)
+            {
+                return false;
+            }
+            else
+            {
+                int result;
+                return int.TryParse(param[0], out result);
+            }
         }
 
-        public void invalidArgumentPopUpCircle()
+        public bool checkTwoParams(string[] parameters)
         {
+            if (parameters.Length != 2)
+            {
+                return false;
+            }
+            else
+            {
+                int result;
+                return (int.TryParse(parameters[0], out result) && int.TryParse(parameters[1], out result));
+            }
+        }
+
+        public bool checkThreeParams(string[] parameters)
+        {
+            if (parameters.Length != 3)
+            {
+                return false;
+            }
+            else
+            {
+                int result;
+                return int.TryParse(parameters[0], out result) && int.TryParse(parameters[1], out result) && int.TryParse(parameters[2], out result);
+            }
+        }
+
+        //Invalid arguments pop-up message.
+        public void invalidArgumentsPopUp(string type, int numberOfArgs)
+        {
+            string args;
+
+            if(numberOfArgs > 1)
+            {
+                args = "arguments";
+            } else
+            {
+                args = "argument";
+            }
             System.Windows.Forms.MessageBoxButtons button = System.Windows.Forms.MessageBoxButtons.OK;
-            string caption = "INVALID PARAMETER";
-            string message = "Circle function only takes one Integer arugment";
+            string caption = "INVALID PARAMETERs";
+            string message = ($"{type} function takes {numberOfArgs} INTEGER {args}!");
+            message = message.Substring(0, 1).ToUpper() + message.Substring(1, message.Length - 1);
             System.Windows.Forms.MessageBoxIcon icon = System.Windows.Forms.MessageBoxIcon.Error;
             System.Windows.Forms.MessageBox.Show(message, caption, button, icon);
         }
