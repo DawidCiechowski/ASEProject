@@ -26,7 +26,7 @@ namespace ASEProject
                 Point drawToPoint = new Point(x, y);
                 g.DrawLine(new Pen(Color.White), currentPoint, drawToPoint);
                 g.Dispose();
-            }
+            } 
 
             f.getMainDraw().Invalidate();
             f.setCurrentX(x);

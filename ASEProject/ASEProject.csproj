@@ -65,6 +65,7 @@
     <Compile Include="RectangleCommand.cs" />
     <Compile Include="SaveFile.cs" />
     <Compile Include="TriangleCommand.cs" />
+    <Compile Include="UserDefinedFunction.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

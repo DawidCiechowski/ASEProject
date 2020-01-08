@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace ASEProject
 {
@@ -10,9 +14,24 @@ namespace ASEProject
     {
         //Vars and constructor
         Form1 f;
+        RichTextBox commandsTextBox;
+        public bool functionFlag, loopFlag, ifFlag, syntaxError;
+        Dictionary<string, string> variables = new Dictionary<string, string>();
+        List<UserDefinedFunction> userFunctions = new List<UserDefinedFunction>();
+
         public CommandRunner(Form1 f)
         {
             this.f = f;
+            this.functionFlag = false;
+            this.loopFlag = false;
+            this.ifFlag = false;
+            this.syntaxError = false;
+        }
+
+        public CommandRunner(Form1 f, RichTextBox commandsTextBox)
+        {
+            this.f = f;
+            this.commandsTextBox = commandsTextBox;
         }
 
         /**
@@ -24,66 +43,173 @@ namespace ASEProject
        
         public void executeCommand(string com)
         {
+            //Create regular expressions
+            string userDefinedRegex = @"^(func)"; 
+            string predefinedFunctionsRegex = @"^(circle|rectangle|triangle|moveTo|drawTo)";
+            string predefinedClearingRegex = @"^(clear|clearText)";
+            string varRegex = @"^(var)";
             ParameterParser parser = new ParameterParser();
-            if (com.Equals("clearText"))
-            {
-                f.getCommandsRichTextBox().Clear();
-            }
-            else if (com.Equals("clear"))
-            {
-                ClearCommand cc = new ClearCommand(f);
-                cc.doAction();
-            }
-            else if (com.Contains("circle(") && com.EndsWith(")"))
-            {
-                int[] radius = parser.parseParams(com);
-                if (radius != null)
-                {
-                    Circle circle = new Circle(f, radius[0]);
-                    circle.doAction();
-                }
-            }
-            else if (com.Contains("moveTo(") && com.EndsWith(")"))
-            {
-                int[] parameters = parser.parseParams(com);
-                if (parameters != null)
-                {
-                    MoveToCommand move = new MoveToCommand(f, parameters[0], parameters[1]);
-                    move.doAction();
-                }
-            }
-            else if (com.Contains("drawTo(") && com.EndsWith(")"))
-            {
-                int[] parameters = parser.parseParams(com);
-                if (parameters != null)
-                {
-                    DrawToCommand draw = new DrawToCommand(f, parameters[0], parameters[1]);
-                    draw.doAction();
-                }
-            }
-            else if (com.Contains("rectangle(") && com.EndsWith(")"))
-            {
-                int[] parameters = parser.parseParams(com);
-                if (parameters != null)
-                {
-                    RectangleCommand rect = new RectangleCommand(f, parameters[0], parameters[1]);
-                    rect.doAction();
-                }
+            
 
-            } else if(com.Contains("triangle(") && com.EndsWith(")"))
+            if (!functionFlag && !loopFlag && !ifFlag && !syntaxError)
             {
-                int[] parameters = parser.parseParams(com);
-                if (parameters != null)
+                if (Regex.IsMatch(com, predefinedFunctionsRegex) && com.EndsWith(")"))
                 {
-                    TriangleCommand triangle = new TriangleCommand(f, parameters[0], parameters[1], parameters[2]);
-                    triangle.doAction();
+                    int[] parameters = parser.parseParams(com, variables);
+                    if (parameters != null)
+                    {
+                        callAppropriatePredefinedFunction(Regex.Match(com, predefinedFunctionsRegex).ToString(), parameters);
+                    }
                 }
+                else if (Regex.IsMatch(com, userDefinedRegex))
+                {
+                    string c = com.Split(new string[] { "func" }, StringSplitOptions.None)[1];
+                    c = c.Substring(1, c.Length - 1);
+                }
+                else if (Regex.IsMatch(com, predefinedClearingRegex))
+                {
+                    callAppropriatePredefinedFunction(Regex.Match(com, predefinedClearingRegex).ToString());
+                }
+                else if(Regex.IsMatch(com, varRegex))
+                {
+                    if(appropriateVarAssignment(com))
+                    {
+                        string varName = com.Split()[1];
+                        string varValue = com.Split()[3];
+                        addVariable(varName, varValue);
+                    }
+                }
+            }
+        }
+
+        private bool appropriateVarAssignment(string assignment)
+        {
+            string[] assignmentParts = assignment.Split();
+
+            if(assignmentParts.Length != 4)
+            {
+                return false;
             } else
             {
-                parser.parseParams(com);
+                if(assignmentParts[2].Equals("=") && int.TryParse(assignmentParts[3], out int res))
+                {
+                    return true;
+                }
             }
 
-            f.getCommandsTextBox().Clear();
+            return false;
+        }
+
+        private void addVariable(string varName, string varValue)
+        {
+            if (!variables.ContainsKey(varName))
+            {
+                variables.Add(varName, varValue);
+            }
+        }
+
+
+        public void callAppropriatePredefinedFunction(string predefinedFunction)
+        {
+            switch(predefinedFunction)
+            {
+                case "clear":
+                    clearFunction();
+                    break;
+                case "clearText":
+                    clearTextFunction();
+                    break;
+                default:
+                    invalidFunctionPopUp(predefinedFunction);
+                    break;
+            }
+        }
+
+        public void callAppropriatePredefinedFunction(string predefinedFunction, int[] parameters)
+        {
+            switch (predefinedFunction)
+            {
+                case "triangle":
+                    triangleFunction(parameters);
+                    break;
+                case "circle":
+                    circleFunction(parameters);
+                    break;
+                case "rectangle":
+                    rectangleFunction(parameters);
+                    break;
+                case "moveTo":
+                    moveToFunction(parameters);
+                    break;
+                case "drawTo":
+                    drawToFunction(parameters);
+                    break;
+                default:
+                    invalidFunctionPopUp(predefinedFunction);
+                    break;
+            }
+        }
+
+        public void circleFunction(int[] parameters)
+        {
+            Circle circle = new Circle(f, parameters[0]);
+            circle.doAction();
+        }
+
+        public void rectangleFunction(int[] parameters)
+        {
+            RectangleCommand rect = new RectangleCommand(f, parameters[0], parameters[1]);
+            rect.doAction();
+        }
+
+        public void triangleFunction(int[] parameters)
+        {
+            TriangleCommand triangle = new TriangleCommand(f, parameters[0], parameters[1], parameters[2]);
+            triangle.doAction();
+        }
+
+        public void drawToFunction(int[] parameters)
+        {
+            DrawToCommand drawTo = new DrawToCommand(f, parameters[0], parameters[1]);
+            drawTo.doAction();
+        }
+
+        public void moveToFunction(int[] parameters)
+        {
+            MoveToCommand moveTo = new MoveToCommand(f, parameters[0], parameters[1]);
+            moveTo.doAction();
+        }
+
+        public void clearFunction()
+        {
+            ClearCommand cc = new ClearCommand(f);
+            cc.doAction();
+        }
+
+        public void clearTextFunction()
+        {
+            f.getCommandsRichTextBox().Clear();
+        }
+
+        public void invalidFunctionPopUp(string type)
+        {
+            
+            System.Windows.Forms.MessageBoxButtons button = System.Windows.Forms.MessageBoxButtons.OK;
+            string caption = "INVALID FUNCTION NAME";
+            string message = ($"{type} function doesn't exist in the current context!");
+            message = message.Substring(0, 1).ToUpper() + message.Substring(1, message.Length - 1);
+            System.Windows.Forms.MessageBoxIcon icon = System.Windows.Forms.MessageBoxIcon.Error;
+            System.Windows.Forms.MessageBox.Show(message, caption, button, icon);
+        }
+
+        public void syntaxErrorPopUp(string com)
+        {
+
+            System.Windows.Forms.MessageBoxButtons button = System.Windows.Forms.MessageBoxButtons.OK;
+            string caption = "SYNTAX ERROR";
+            string message = ($"Syntax error at: {com}");
+            System.Windows.Forms.MessageBoxIcon icon = System.Windows.Forms.MessageBoxIcon.Error;
+            System.Windows.Forms.MessageBox.Show(message, caption, button, icon);
         }
     }
 }

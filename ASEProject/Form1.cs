@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
-
+using System.Threading;
 
 namespace ASEProject
 {
@@ -19,7 +19,10 @@ namespace ASEProject
         Bitmap bm;
         private int currentX, currentY;
         private string currentFile;
-     
+        List<String> commands;
+        CommandRunner cr;
+
+
         public Form1()
         {
             InitializeComponent();
@@ -32,34 +35,48 @@ namespace ASEProject
             currentX = 0;
             currentY = 0;
             currentFile = "";
+
+            //List of commands
+
+            commands = new List<String>();
+
+            //Thread
+            cr = new CommandRunner(this, richTextBoxCommands);
+
         }
 
+        public delegate void clearText();
+        public delegate void setLabelX();
+        public delegate void setLabelY();
         private void textBoxCommand_KeyUp(object sender, KeyEventArgs e)
         {
             //Execute all commands using 'run' or one command at a time.
-            CommandRunner cr = new CommandRunner(this);
 
             if (e.KeyCode == Keys.Enter)
             {
+                
                 string com = textBoxCommand.Text.ToString();
                 if (com.Equals("run"))
                 {
-
-                    string[] commands = richTextBoxCommands.Text.ToString().Split('\n');
                     
+                    commands.Clear();
+                    commands = richTextBoxCommands.Text.ToString().Split('\n').ToList(); ;
                     foreach (string command in commands)
                     {
                         cr.executeCommand(command);
-                    } 
-                }
+                    }
+
+                    cr.syntaxError = false;
+                    }
                 else
                 {
                     cr.executeCommand(textBoxCommand.Text.ToString());
-                    
+                    textBoxCommand.Clear();
                 }
             }
         }
 
+      
         
         //On load actions
         private void Form1_Load(object sender, EventArgs e)
@@ -141,7 +158,7 @@ namespace ASEProject
         //Lint - Command Highlighter
         public void HighlightKeyWordsRichTextBox(string text)
         {
-            string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo)";
+            string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo|func)";
             Regex regex = new Regex(expressions);
             MatchCollection mc = regex.Matches(text);
             int startCursorPosition = richTextBoxCommands.SelectionStart;
@@ -151,13 +168,21 @@ namespace ASEProject
                 int startIndex = m.Index;
                 int stopIndex = m.Length;
                 richTextBoxCommands.Select(startIndex, stopIndex);
-                richTextBoxCommands.SelectionColor = Color.Green;
+                if (m.ToString().Equals("func"))
+                {
+                    richTextBoxCommands.SelectionColor = Color.Crimson;
+                }
+                else
+                {
+                    richTextBoxCommands.SelectionColor = Color.Green;
+                }
                 richTextBoxCommands.SelectionStart = startCursorPosition;
 
 
                 richTextBoxCommands.SelectionColor = Color.FromArgb(0, 104, 184, 236);
             }
         }
+
 
 
         //Button functions LOAD/SAVE/EXIT

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace ASEProject
 {
@@ -13,7 +14,7 @@ namespace ASEProject
 
 
 
-        public int[] parseParams(string command)
+        public int[] parseParams(string command, Dictionary<string, string> userVars)
         {
 
             MatchCollection matches = checkFunction(command);
@@ -22,6 +23,19 @@ namespace ASEProject
                 string funcVars = Regex.Match(matches[0].ToString(), @"\([^)]*\)").ToString();
                 string funcType = matches[0].ToString().Split(funcVars.ToCharArray())[0];
                 string[] vars = funcVars.Substring(1, funcVars.Length - 2).Split(',');
+
+                for(int i = 0; i < vars.Length; i++)
+                {
+                    if(userVars.ContainsKey(vars[i]))
+                    {
+                        vars[i] = userVars[vars[i]].ToString();
+                    }
+                }
+
+                for(int i =0; i < vars.Length; i++)
+                {
+                    Debug.WriteLine(vars[i]);
+                }
 
 
                 if (validateInput(funcType, vars))
@@ -49,7 +63,7 @@ namespace ASEProject
             int[] returnVars = new int[vars.Length];
             for (int i = 0; i < vars.Length; ++i)
             {
-                returnVars[i] = int.Parse(vars[i].ToString());
+                returnVars[i] = int.Parse(vars[i]);
             }
 
             return returnVars;
@@ -100,8 +114,6 @@ namespace ASEProject
         //Check parameters functions
         public bool checkOneParam(string[] param)
         {
-            Debug.WriteLine(param.Length);
-
             if (param.Length != 1)
             {
                 return false;
