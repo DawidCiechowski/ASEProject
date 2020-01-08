@@ -32,11 +32,6 @@ namespace ASEProject
                     }
                 }
 
-                for(int i =0; i < vars.Length; i++)
-                {
-                    Debug.WriteLine(vars[i]);
-                }
-
 
                 if (validateInput(funcType, vars))
                 {

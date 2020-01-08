@@ -54,7 +54,7 @@ namespace ASEProject
 
             if (e.KeyCode == Keys.Enter)
             {
-                
+                cr.clearAll();
                 string com = textBoxCommand.Text.ToString();
                 if (com.Equals("run"))
                 {
@@ -158,7 +158,7 @@ namespace ASEProject
         //Lint - Command Highlighter
         public void HighlightKeyWordsRichTextBox(string text)
         {
-            string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo|func)";
+            string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo|func|if|endif|for|endfor|var)";
             Regex regex = new Regex(expressions);
             MatchCollection mc = regex.Matches(text);
             int startCursorPosition = richTextBoxCommands.SelectionStart;
@@ -171,6 +171,15 @@ namespace ASEProject
                 if (m.ToString().Equals("func"))
                 {
                     richTextBoxCommands.SelectionColor = Color.Crimson;
+                } else if(m.ToString().Equals("if") || m.ToString().Equals("endif"))
+                {
+                    richTextBoxCommands.SelectionColor = Color.DeepPink;
+                }else if (m.ToString().Equals("for") || m.ToString().Equals("endfor"))
+                {
+                    richTextBoxCommands.SelectionColor = Color.AliceBlue;
+                } else if(m.ToString().Equals("var"))
+                {
+                    richTextBoxCommands.SelectionColor = Color.Orange;
                 }
                 else
                 {

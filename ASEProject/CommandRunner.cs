@@ -18,6 +18,7 @@ namespace ASEProject
         public bool functionFlag, loopFlag, ifFlag, syntaxError;
         Dictionary<string, string> variables = new Dictionary<string, string>();
         List<UserDefinedFunction> userFunctions = new List<UserDefinedFunction>();
+        bool currentIfClause = false;
 
         public CommandRunner(Form1 f)
         {
@@ -43,45 +44,134 @@ namespace ASEProject
        
         public void executeCommand(string com)
         {
-            //Create regular expressions
-            string userDefinedRegex = @"^(func)"; 
-            string predefinedFunctionsRegex = @"^(circle|rectangle|triangle|moveTo|drawTo)";
-            string predefinedClearingRegex = @"^(clear|clearText)";
-            string varRegex = @"^(var)";
-            ParameterParser parser = new ParameterParser();
+            
             
 
             if (!functionFlag && !loopFlag && !ifFlag && !syntaxError)
             {
-                if (Regex.IsMatch(com, predefinedFunctionsRegex) && com.EndsWith(")"))
+                doTask(com);
+            } else
+            {
+                if(ifFlag)
                 {
-                    int[] parameters = parser.parseParams(com, variables);
-                    if (parameters != null)
+                    if(currentIfClause)
                     {
-                        callAppropriatePredefinedFunction(Regex.Match(com, predefinedFunctionsRegex).ToString(), parameters);
+                        Debug.WriteLine("TRUE");
+                        if (!com.Equals("endif"))
+                        {
+                            doTask(com);
+                            Debug.WriteLine("TASK");
+                        } else
+                        {
+                            ifFlag = false;
+                            Debug.WriteLine("FLAG FALSE");
+                        }
                     }
-                }
-                else if (Regex.IsMatch(com, userDefinedRegex))
-                {
-                    string c = com.Split(new string[] { "func" }, StringSplitOptions.None)[1];
-                    c = c.Substring(1, c.Length - 1);
-                }
-                else if (Regex.IsMatch(com, predefinedClearingRegex))
-                {
-                    callAppropriatePredefinedFunction(Regex.Match(com, predefinedClearingRegex).ToString());
-                }
-                else if(Regex.IsMatch(com, varRegex))
-                {
-                    if(appropriateVarAssignment(com))
+                    else
                     {
-                        string varName = com.Split()[1];
-                        string varValue = com.Split()[3];
-                        addVariable(varName, varValue);
+
+                        if (com.Equals("endif"))
+                        {
+                            ifFlag = false;
+                        }
                     }
                 }
             }
         }
 
+        private bool checkIfClause(string com)
+        {
+            var val1 = com.Split()[1];
+            var val2 = com.Split()[3];
+
+            if(checkIfInVariables(val1)) {
+                val1 = variables[val1];
+            }
+
+            if (checkIfInVariables(val2))
+            {
+                val2 = variables[val2];
+            }
+
+            return val1.Equals(val2);
+
+        }
+
+
+        private bool checkIfInVariables(string var)
+        {
+            return variables.ContainsKey(var);
+        }
+        private void doTask(string com)
+        {
+            //Create regular expressions
+            string userDefinedRegex = @"^(func)";
+            string predefinedFunctionsRegex = @"^(circle|rectangle|triangle|moveTo|drawTo)";
+            string predefinedClearingRegex = @"^(clear|clearText)";
+            string varRegex = @"^(var)";
+            string ifRegex = @"^(if)";
+            ParameterParser parser = new ParameterParser();
+
+            if (Regex.IsMatch(com, predefinedFunctionsRegex) && com.EndsWith(")"))
+            {
+                int[] parameters = parser.parseParams(com, variables);
+                if (parameters != null)
+                {
+                    callAppropriatePredefinedFunction(Regex.Match(com, predefinedFunctionsRegex).ToString(), parameters);
+                }
+            }
+            else if (Regex.IsMatch(com, userDefinedRegex))
+            {
+                string c = com.Split(new string[] { "func" }, StringSplitOptions.None)[1];
+                c = c.Substring(1, c.Length - 1);
+            }
+            else if (Regex.IsMatch(com, predefinedClearingRegex))
+            {
+                callAppropriatePredefinedFunction(Regex.Match(com, predefinedClearingRegex).ToString());
+            }
+            else if (Regex.IsMatch(com, varRegex))
+            {
+                varClause(com);
+            }
+            else if (Regex.IsMatch(com, ifRegex))
+            {
+                ifClause(com);
+            }
+        }
+
+        private void ifClause(string com)
+        {
+            if (appropriateIfAssignment(com))
+            {
+                ifFlag = true;
+                currentIfClause = checkIfClause(com);
+            }
+        }
+
+        private void varClause(string com)
+        {
+            if (appropriateVarAssignment(com))
+            {
+                string varName = com.Split()[1];
+                string varValue = com.Split()[3];
+                addVariable(varName, varValue);
+            }
+        }
+
+        private bool appropriateIfAssignment(string com)
+        {
+            string[] parts = com.Split();
+
+            if(parts.Length == 4)
+            {
+                if (parts[2].Equals("="))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         private bool appropriateVarAssignment(string assignment)
         {
             string[] assignmentParts = assignment.Split();
@@ -210,6 +300,16 @@ namespace ASEProject
             string message = ($"Syntax error at: {com}");
             System.Windows.Forms.MessageBoxIcon icon = System.Windows.Forms.MessageBoxIcon.Error;
             System.Windows.Forms.MessageBox.Show(message, caption, button, icon);
+        }
+
+        public void clearAll()
+        {
+            variables.Clear();
+            userFunctions.Clear();
+            ifFlag = false;
+            loopFlag = false;
+            functionFlag = false;
+            currentIfClause = false;
         }
     }
 }
