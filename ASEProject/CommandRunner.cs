@@ -19,6 +19,9 @@ namespace ASEProject
         Dictionary<string, string> variables = new Dictionary<string, string>();
         List<UserDefinedFunction> userFunctions = new List<UserDefinedFunction>();
         bool currentIfClause = false;
+        string currentForLoop = "";
+        string loop = "";
+        List<string> forLoopCommands = new List<string>();
 
         public CommandRunner(Form1 f)
         {
@@ -44,9 +47,6 @@ namespace ASEProject
        
         public void executeCommand(string com)
         {
-            
-            
-
             if (!functionFlag && !loopFlag && !ifFlag && !syntaxError)
             {
                 doTask(com);
@@ -54,27 +54,153 @@ namespace ASEProject
             {
                 if(ifFlag)
                 {
-                    if(currentIfClause)
+                    executeIfClauseBehaviour(com);
+                }
+
+                if (loopFlag)
+                {
+                    if (!com.Equals("endfor"))
                     {
-                        Debug.WriteLine("TRUE");
-                        if (!com.Equals("endif"))
-                        {
-                            doTask(com);
-                            Debug.WriteLine("TASK");
-                        } else
-                        {
-                            ifFlag = false;
-                            Debug.WriteLine("FLAG FALSE");
-                        }
+                        forLoopCommands.Add(com);
                     }
                     else
                     {
-
-                        if (com.Equals("endif"))
-                        {
-                            ifFlag = false;
-                        }
+                        executeForLoop();
                     }
+                }
+
+            }
+        }
+
+        private void executeForLoop()
+        {
+            if(currentForLoop.Equals("Basic"))
+            {
+                executeBasicForLoop();
+            } else if(currentForLoop.Equals("Ranged"))
+            {
+                executeRangedForLoop();
+            } else
+            {
+                executeSteppedForLoop();
+            }
+        }
+
+        private void executeBasicForLoop()
+        {
+            int iterations = getIterations();
+            for (int i = 0; i < iterations; i++)
+            {
+                for (int j = 0; j < forLoopCommands.Count(); j++)
+                {
+                    doTask(forLoopCommands[j]);
+                }
+            }
+        }
+
+        private void executeRangedForLoop()
+        {
+            int iterations = getIterations();
+            int startIndex = getStartIndex();
+
+            Debug.WriteLine(startIndex);
+
+            for (int i = startIndex; i < iterations; i++)
+            {
+                for (int j = 0; j < forLoopCommands.Count(); j++)
+                {
+                    doTask(forLoopCommands[j]);
+                }
+            }
+        }
+
+        private void executeSteppedForLoop()
+        {
+            int iterations = getIterations();
+            int startIndex = getStartIndex();
+            int step = getStep();
+
+            for (int i = startIndex; i < iterations; i += step)
+            {
+                for (int j = 0; j < forLoopCommands.Count(); j++)
+                {
+                    doTask(forLoopCommands[j]);
+                }
+            }
+        }
+
+        private int getStartIndex()
+        {
+            string var = loop.Split()[5].Split(',')[0];
+            if (checkIfInVariables(var))
+            {
+                return int.Parse(variables[var]);
+            }
+            else
+            {
+                return int.Parse(var);
+            }
+        }
+
+        private int getStep()
+        {
+            string var = loop.Split()[5].Split(',')[2];
+            if (checkIfInVariables(var))
+            {
+                return int.Parse(variables[var]);
+            }
+            else
+            {
+                return int.Parse(var);
+            }
+        }
+
+        private int getIterations()
+        {
+            string[] vars = loop.Split()[5].Split(',');
+            if (vars.Length == 1)
+            {
+                if (checkIfInVariables(vars[0]))
+                {
+                    return int.Parse(variables[vars[0]]);
+                }
+                else
+                {
+                    return int.Parse(vars[0]);
+                }
+            } else
+            {
+                if (checkIfInVariables(vars[1]))
+                {
+                    return int.Parse(variables[vars[1]]);
+                }
+                else
+                {
+                    return int.Parse(vars[1]);
+                }
+            }
+
+         
+        }
+        private void executeIfClauseBehaviour(string com)
+        {
+            if (currentIfClause)
+            {
+                if (!com.Equals("endif"))
+                {
+                    doTask(com);
+                }
+                else
+                {
+                    ifFlag = false;
+                }
+            }
+            else
+            {
+
+                if (com.Equals("endif"))
+                {
+                    ifFlag = false;
                 }
             }
         }
@@ -102,6 +228,7 @@ namespace ASEProject
         {
             return variables.ContainsKey(var);
         }
+
         private void doTask(string com)
         {
             //Create regular expressions
@@ -110,6 +237,7 @@ namespace ASEProject
             string predefinedClearingRegex = @"^(clear|clearText)";
             string varRegex = @"^(var)";
             string ifRegex = @"^(if)";
+            string forRegex = @"^(for)";
             ParameterParser parser = new ParameterParser();
 
             if (Regex.IsMatch(com, predefinedFunctionsRegex) && com.EndsWith(")"))
@@ -136,9 +264,160 @@ namespace ASEProject
             else if (Regex.IsMatch(com, ifRegex))
             {
                 ifClause(com);
+            } else if(Regex.IsMatch(com, forRegex))
+            {
+                forLoop(com);
+            } else if(variables.ContainsKey(com.Split()[0]))
+            {
+                reassignValue(com);
             }
         }
 
+        private void reassignValue(string com)
+        {
+            if(validReassignment(com))
+            {
+                int reassignedValue = int.Parse(variables[com.Split()[0]]) + int.Parse(com.Split()[2]);
+                variables[com.Split()[0]] = reassignedValue.ToString();
+            }
+        }
+
+        private bool validReassignment(string com)
+        {
+            if(com.Split()[1].Equals("+") && int.TryParse(com.Split()[2], out int re))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void forLoop(string com)
+        {
+            if(appropriateForLoopAssignment(com))
+            {
+                loopFlag = true;
+            }
+        }
+
+        private bool appropriateForLoopAssignment(string com)
+        {
+            //for var i in range = 10
+            //for var i in range = 1,10
+            //for var i in range = 1,10,3
+            string[] parts = com.Split();
+            if (parts.Length == 6)
+            {
+                if (parts[5].Split(',').Length == 1 && int.TryParse(parts[5], out int q))
+                {
+                    currentForLoop = "Basic";
+                    loop = com;
+                    return basicForLoop(com, parts);
+                } else if(parts[5].Split(',').Length == 2)
+                {
+
+                    string[] forLoopNumbers = parts[5].Split(',');
+                    string start = forLoopNumbers[0];
+                    string range = forLoopNumbers[1];
+                    if (int.TryParse(start, out int s) && int.TryParse(range, out int r))
+                    {
+                        loop = com;
+                        currentForLoop = "Ranged";
+                        return rangedForLoop(com, parts);
+                    }
+                } else if(parts[5].Split(',').Length == 3)
+                {
+                    string[] forLoopNumbers = parts[5].Split(',');
+                    string start = forLoopNumbers[0];
+                    string range = forLoopNumbers[1];
+                    string step = forLoopNumbers[2];
+
+                    if (int.TryParse(start, out int s) && int.TryParse(range, out int r) && int.TryParse(step, out int st))
+                    {
+                        loop = com;
+                        currentForLoop = "Step";
+                        return stepForLoop(com, parts);
+                    }
+                } else
+                {
+                    syntaxErrorPopUp(com);
+                }
+            } 
+            else
+            {
+                syntaxErrorPopUp(com);
+            }
+
+            return false;
+        }
+
+        private bool basicForLoop(string com, string[] parts)
+        {
+            if (parts[4].Equals("="))
+            {
+                    if (int.TryParse(parts[5], out int res))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        syntaxErrorPopUp(com);
+                    }
+
+            }
+            else
+            {
+                syntaxErrorPopUp(com);
+                return false;
+            }
+
+            return false;
+        }
+
+        private bool rangedForLoop(string com, string[] parts)
+        {
+            if (parts[4].Equals("="))
+            {
+                if (int.TryParse(parts[5].Split(',')[0], out int res) && int.TryParse(parts[5].Split(',')[1], out int r))
+                {
+                    return true;
+                }
+                else
+                {
+                    syntaxErrorPopUp(com);
+                }
+
+            }
+            else
+            {
+                syntaxErrorPopUp(com);
+            }
+
+            return false;
+        }
+
+        private bool stepForLoop(string com, string[] parts)
+        {
+            if (parts[4].Equals("="))
+            {
+                if (int.TryParse(parts[5].Split(',')[0], out int res) && int.TryParse(parts[5].Split(',')[1], out int r)
+                    && int.TryParse(parts[5].Split(',')[2], out int s))
+                {
+                    return true;
+                }
+                else
+                {
+                    syntaxErrorPopUp(com);
+                }
+
+            }
+            else
+            {
+                syntaxErrorPopUp(com);
+            }
+
+            return false;
+        }
         private void ifClause(string com)
         {
             if (appropriateIfAssignment(com))
@@ -310,6 +589,9 @@ namespace ASEProject
             loopFlag = false;
             functionFlag = false;
             currentIfClause = false;
+            currentForLoop = "";
+            loop = "";
+            forLoopCommands.Clear();
         }
     }
 }
