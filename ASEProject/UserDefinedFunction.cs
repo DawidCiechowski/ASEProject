@@ -3,38 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ASEProject
 {
-    class UserDefinedFunction : Command
+    class UserDefinedFunction 
     {
-        private int numOfParams;
+        private int numOfParams = 0;
         private string name;
-        private Form1 f;
-        private Dictionary<string, object> parameters;
         private List<string> tasks;
-        
+        private Dictionary<string, string> parameters;
 
 
-        public UserDefinedFunction(string name, int numOfParams, Form1 f, Dictionary<string, object> parameters)
+
+
+        public UserDefinedFunction(string name)
         {
             this.name = name;
-            this.numOfParams = numOfParams;
-            this.f = f;
-            this.parameters = parameters;
+            parameters = new Dictionary<string, string>();
             tasks = new List<string>();
         }
 
-        public void doAction()
+        public UserDefinedFunction(string name, int  nOOfParameters)
         {
-            if (verifyFunctionCall())
-            {
-                CommandRunner cr = new CommandRunner(f);
-                for (int i = 0; i < tasks.Count(); ++i)
-                {
-                    cr.executeCommand(tasks.ElementAt(i));
-                }
-            }
+            this.name = name;
+            this.numOfParams = nOOfParameters;
+            parameters = new Dictionary<string, string>();
+            tasks = new List<string>();
         }
 
         public void addTask(string task)
@@ -42,10 +37,14 @@ namespace ASEProject
             tasks.Add(task);
         }
 
-        public bool verifyFunctionCall()
+        public List<string> getTasks()
         {
-            return false;
+            return tasks;
         }
 
+        public void setParams(string varName, string varValue)
+        {
+            parameters.Add(varName, varValue);
+        }
     }
 }

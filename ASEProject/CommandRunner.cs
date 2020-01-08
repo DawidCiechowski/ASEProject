@@ -17,11 +17,13 @@ namespace ASEProject
         RichTextBox commandsTextBox;
         public bool functionFlag, loopFlag, ifFlag, syntaxError;
         Dictionary<string, string> variables = new Dictionary<string, string>();
-        List<UserDefinedFunction> userFunctions = new List<UserDefinedFunction>();
+        Dictionary<string,UserDefinedFunction> userFunctions = new Dictionary<string, UserDefinedFunction>();
         bool currentIfClause = false;
+        bool functionExecutionFlag = false;
         string currentForLoop = "";
         string loop = "";
         List<string> forLoopCommands = new List<string>();
+        string currentFunction = "";
 
         public CommandRunner(Form1 f)
         {
@@ -52,6 +54,18 @@ namespace ASEProject
                 doTask(com);
             } else
             {
+
+                if(functionFlag)
+                {
+                    if(!com.Equals("endfunc"))
+                    {
+                        Debug.WriteLine("I'm here");
+                        userFunctions[currentFunction].addTask(com);
+                    } else
+                    {
+                        functionFlag = false;
+                    }
+                }
                 if(ifFlag)
                 {
                     executeIfClauseBehaviour(com);
@@ -103,7 +117,6 @@ namespace ASEProject
             int iterations = getIterations();
             int startIndex = getStartIndex();
 
-            Debug.WriteLine(startIndex);
 
             for (int i = startIndex; i < iterations; i++)
             {
@@ -250,8 +263,9 @@ namespace ASEProject
             }
             else if (Regex.IsMatch(com, userDefinedRegex))
             {
-                string c = com.Split(new string[] { "func" }, StringSplitOptions.None)[1];
-                c = c.Substring(1, c.Length - 1);
+                
+                userFunction(com);
+
             }
             else if (Regex.IsMatch(com, predefinedClearingRegex))
             {
@@ -270,7 +284,82 @@ namespace ASEProject
             } else if(variables.ContainsKey(com.Split()[0]))
             {
                 reassignValue(com);
+            } if(userFunctions.ContainsKey(com.Split('(')[0]))
+            {
+                currentFunction = com.Split('(')[0];
+                functionExecutionFlag = true;
+                executeFunction();
+                //executeCommand(com);
             }
+        }
+
+        private void executeFunction()
+        {
+            if (validCall())
+            {
+                for (int i = 0; i < userFunctions[currentFunction].getTasks().Count(); i++)
+                {
+                    doTask(userFunctions[currentFunction].getTasks().ElementAt(i));
+                }
+                functionExecutionFlag = false;
+            }
+        }
+        private bool validCall()
+        {
+            return true;
+        }
+
+        private void userFunction(string com)
+        {
+         
+            string[] func = com.Split(new string[] { "func" }, StringSplitOptions.None);
+            string function = func[1];
+            if (validFunctionAssignment(func, function))
+            {
+                createUserFunction(function);
+            } else
+            {
+                functionFlag = false;
+            }
+        }
+
+        private void createUserFunction(string function)
+        {
+            
+            string[] functionParts = function.Split('(');
+            string functionName = functionParts[0].Substring(1, functionParts[0].Length-1);
+            if(functionParts[1].Length > 1)
+            {
+                string[] functionParams = functionParts[1].Substring(0, functionParts[1].Length - 2).Split(',');
+                userFunctions.Add(functionName, new UserDefinedFunction(functionName, functionParams.Length));
+                currentFunction = functionName;
+                functionFlag = true;
+            } else
+            {
+                userFunctions.Add(functionName, new UserDefinedFunction(functionName));
+                currentFunction = functionName;
+                functionFlag = true;
+            }   
+            
+        }
+
+        private bool validFunctionAssignment(string[] func, string function)
+        {
+            if(func.Length == 2)
+            {
+                if(function.Contains("(") && function.EndsWith(")"))
+                {
+                    if(function.Count(f => f == '(') == 1 && function.Count(f => f == ')') == 1)
+                    {
+                        if(!function.StartsWith("(") || !function.StartsWith(")"))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         private void reassignValue(string com)
@@ -477,7 +566,6 @@ namespace ASEProject
             }
         }
 
-
         public void callAppropriatePredefinedFunction(string predefinedFunction)
         {
             switch(predefinedFunction)
@@ -592,6 +680,7 @@ namespace ASEProject
             currentForLoop = "";
             loop = "";
             forLoopCommands.Clear();
+            functionExecutionFlag = false;
         }
     }
 }

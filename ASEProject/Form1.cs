@@ -158,7 +158,7 @@ namespace ASEProject
         //Lint - Command Highlighter
         public void HighlightKeyWordsRichTextBox(string text)
         {
-            string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo|func|if|endif|for|endfor|var)";
+            string expressions = "(circle|rectangle|triangle|clear|moveTo|drawTo|func|endfunc|if|endif|for|endfor|var)";
             Regex regex = new Regex(expressions);
             MatchCollection mc = regex.Matches(text);
             int startCursorPosition = richTextBoxCommands.SelectionStart;
@@ -168,7 +168,7 @@ namespace ASEProject
                 int startIndex = m.Index;
                 int stopIndex = m.Length;
                 richTextBoxCommands.Select(startIndex, stopIndex);
-                if (m.ToString().Equals("func"))
+                if (m.ToString().Equals("func") || m.ToString().Equals("endfunc"))
                 {
                     richTextBoxCommands.SelectionColor = Color.Crimson;
                 } else if(m.ToString().Equals("if") || m.ToString().Equals("endif"))
